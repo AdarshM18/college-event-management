@@ -6,6 +6,8 @@ import Dashboard from "./components/Dashboard";
 import EventManagement from "./components/EventManagement";
 import MerchandiseManagement from "./components/MerchandiseManagement";
 import UserManagement from "./components/UserManagement";
+import logo from './assets/iit-indore-logo.png'; // Import IIT Indore logo
+import './App.css'; // Import custom styles
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -57,49 +59,60 @@ export default function App() {
         </div>
       ) : (
         <Router>
-          <nav className="fixed left-0 top-0 h-full w-64 bg-white shadow-lg">
-            <div className="p-4">
-              <h2 className="text-2xl font-bold text-college-primary mb-8">College Admin</h2>
-              <ul className="space-y-2">
-                <li>
-                  <Link to="/" className="block px-4 py-2 hover:bg-college-secondary rounded">
-                    Dashboard
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/events" className="block px-4 py-2 hover:bg-college-secondary rounded">
-                    Events
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/merchandise" className="block px-4 py-2 hover:bg-college-secondary rounded">
-                    Merchandise
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/users" className="block px-4 py-2 hover:bg-college-secondary rounded">
-                    Users
-                  </Link>
-                </li>
-              </ul>
-
+          {/* Header */}
+          <header className="header">
+            <div className="flex items-center justify-between px-8 py-4 bg-gray-800 text-white">
+              <img src={logo} alt="IIT Indore Logo" className="h-12" />
+              <h2 className="text-xl font-bold">College Admin Panel</h2>
               <button
                 onClick={handleLogout}
-                className="mt-8 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                className="bg-red-500 px-4 py-2 rounded hover:bg-red-600"
               >
                 Logout
               </button>
             </div>
-          </nav>
+          </header>
 
-          <main className="ml-64 p-8">
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/events" element={<EventManagement />} />
-              <Route path="/merchandise" element={<MerchandiseManagement />} />
-              <Route path="/users" element={<UserManagement />} />
-            </Routes>
-          </main>
+          {/* Layout */}
+          <div className="flex mt-[64px]">
+            {/* Sidebar */}
+            <nav className="sidebar fixed left-0 top-[64px] h-full w-64 bg-white shadow-lg">
+              <div className="p-4">
+                <ul className="space-y-2">
+                  <li>
+                    <Link to="/" className="block px-4 py-2 hover:bg-college-secondary rounded">
+                      Dashboard
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/events" className="block px-4 py-2 hover:bg-college-secondary rounded">
+                      Events
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/merchandise" className="block px-4 py-2 hover:bg-college-secondary rounded">
+                      Merchandise
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/users" className="block px-4 py-2 hover:bg-college-secondary rounded">
+                      Users
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+            </nav>
+
+            {/* Main Content */}
+            <main className="ml-[260px] p-8 flex-grow bg-cover bg-center" style={{ backgroundImage: `url('./assets/campus1.jpg')` }}>
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/events" element={<EventManagement />} />
+                <Route path="/merchandise" element={<MerchandiseManagement />} />
+                <Route path="/users" element={<UserManagement />} />
+              </Routes>
+            </main>
+          </div>
         </Router>
       )}
     </div>
