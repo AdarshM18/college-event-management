@@ -1,17 +1,8 @@
 import { useState } from 'react'
+import { useEventContext } from '../context/EventContext'
 
 export default function EventManagement() {
-  const [events, setEvents] = useState([
-    {
-      id: 1,
-      name: 'Tech Fest 2024',
-      date: '2024-03-15',
-      location: 'Main Auditorium',
-      description: 'Annual technical festival',
-      participants: 150
-    }
-  ])
-
+  const { events, addEvent, updateEvent, deleteEvent } = useEventContext()
   const [newEvent, setNewEvent] = useState({
     name: '',
     date: '',
@@ -31,7 +22,10 @@ export default function EventManagement() {
 
   const handleAddEvent = (e) => {
     e.preventDefault()
-    setEvents([...events, { ...newEvent, id: events.length + 1, participants: Number(newEvent.participants) }])
+    addEvent({
+      ...newEvent,
+      participants: Number(newEvent.participants)
+    })
     setNewEvent({ name: '', date: '', location: '', description: '', participants: '' })
   }
 
@@ -41,9 +35,7 @@ export default function EventManagement() {
   }
 
   const handleSaveEdit = () => {
-    setEvents(events.map(event => 
-      event.id === editingEventId ? { ...editedEvent, id: editingEventId } : event
-    ))
+    updateEvent(editingEventId, editedEvent)
     setEditingEventId(null)
     setEditedEvent({ name: '', date: '', location: '', description: '', participants: '' })
   }
