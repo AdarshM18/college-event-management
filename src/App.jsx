@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { HashRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { HashRouter as Router, Routes, Route, NavLink } from "react-router-dom";
 import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
 import { auth } from "./firebase-config";
 import Dashboard from "./components/Dashboard";
 import EventManagement from "./components/EventManagement";
 import MerchandiseManagement from "./components/MerchandiseManagement";
 import UserManagement from "./components/UserManagement";
-import logo from './assets/iit-indore-logo.png'; // Import IIT Indore logo
-import './App.css'; // Import custom styles
+import logo from './assets/iit-indore-logo.png';
+import './App.css';
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -79,25 +79,54 @@ export default function App() {
             <nav className="sidebar fixed left-0 top-[64px] h-full w-64 bg-white shadow-lg">
               <div className="p-4">
                 <ul className="space-y-2">
+                  {/* Use NavLink instead of Link */}
                   <li>
-                    <Link to="/" className="block px-4 py-2 hover:bg-college-secondary rounded">
+                    <NavLink
+                      to="/"
+                      className={({ isActive }) =>
+                        isActive
+                          ? "block px-4 py-2 bg-gray-800 text-white rounded"
+                          : "block px-4 py-2 hover:bg-gray-200 rounded"
+                      }
+                    >
                       Dashboard
-                    </Link>
+                    </NavLink>
                   </li>
                   <li>
-                    <Link to="/events" className="block px-4 py-2 hover:bg-college-secondary rounded">
+                    <NavLink
+                      to="/events"
+                      className={({ isActive }) =>
+                        isActive
+                          ? "block px-4 py-2 bg-gray-800 text-white rounded"
+                          : "block px-4 py-2 hover:bg-gray-200 rounded"
+                      }
+                    >
                       Events
-                    </Link>
+                    </NavLink>
                   </li>
                   <li>
-                    <Link to="/merchandise" className="block px-4 py-2 hover:bg-college-secondary rounded">
+                    <NavLink
+                      to="/merchandise"
+                      className={({ isActive }) =>
+                        isActive
+                          ? "block px-4 py-2 bg-gray-800 text-white rounded"
+                          : "block px-4 py-2 hover:bg-gray-200 rounded"
+                      }
+                    >
                       Merchandise
-                    </Link>
+                    </NavLink>
                   </li>
                   <li>
-                    <Link to="/users" className="block px-4 py-2 hover:bg-college-secondary rounded">
+                    <NavLink
+                      to="/users"
+                      className={({ isActive }) =>
+                        isActive
+                          ? "block px-4 py-2 bg-gray-800 text-white rounded"
+                          : "block px-4 py-2 hover:bg-gray-200 rounded"
+                      }
+                    >
                       Users
-                    </Link>
+                    </NavLink>
                   </li>
                 </ul>
               </div>
