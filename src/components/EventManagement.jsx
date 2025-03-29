@@ -2,57 +2,57 @@ import { useState } from 'react'
 import { useEventContext } from '../context/EventContext'
 
 export default function EventManagement() {
-  const { events, addEvent, updateEvent, deleteEvent } = useEventContext()
+  const { events, addEvent, updateEvent, deleteEvent } = useEventContext(); // Use deleteEvent from context
   const [newEvent, setNewEvent] = useState({
     name: '',
     date: '',
     location: '',
     description: '',
     participants: ''
-  })
+  });
 
-  const [editingEventId, setEditingEventId] = useState(null)
+  const [editingEventId, setEditingEventId] = useState(null);
   const [editedEvent, setEditedEvent] = useState({
     name: '',
     date: '',
     location: '',
     description: '',
     participants: ''
-  })
+  });
 
   const handleAddEvent = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     addEvent({
       ...newEvent,
       participants: Number(newEvent.participants)
-    })
-    setNewEvent({ name: '', date: '', location: '', description: '', participants: '' })
-  }
+    });
+    setNewEvent({ name: '', date: '', location: '', description: '', participants: '' });
+  };
 
   const handleEditClick = (event) => {
-    setEditingEventId(event.id)
-    setEditedEvent(event)
-  }
+    setEditingEventId(event.id);
+    setEditedEvent(event);
+  };
 
   const handleSaveEdit = () => {
-    updateEvent(editingEventId, editedEvent)
-    setEditingEventId(null)
-    setEditedEvent({ name: '', date: '', location: '', description: '', participants: '' })
-  }
+    updateEvent(editingEventId, editedEvent); // Use updateEvent from context
+    setEditingEventId(null);
+    setEditedEvent({ name: '', date: '', location: '', description: '', participants: '' });
+  };
 
   const handleCancelEdit = () => {
-    setEditingEventId(null)
-    setEditedEvent({ name: '', date: '', location: '', description: '', participants: '' })
-  }
+    setEditingEventId(null);
+    setEditedEvent({ name: '', date: '', location: '', description: '', participants: '' });
+  };
 
   const handleDeleteEvent = (eventId) => {
-    setEvents(events.filter(event => event.id !== eventId))
-  }
+    deleteEvent(eventId); // Use deleteEvent from context
+  };
 
   return (
     <div>
       <h1 className="text-3xl font-bold text-college-primary mb-6">Event Management</h1>
-      
+
       {/* Add Event Form */}
       <div className="bg-white p-6 rounded-lg shadow-sm mb-8">
         <h2 className="text-xl font-semibold mb-4">Create New Event</h2>
@@ -112,14 +112,16 @@ export default function EventManagement() {
             </tr>
           </thead>
           <tbody>
-            {events.map(event => (
+            {events.map((event) => (
               <tr key={event.id} className="border-b">
                 <td className="px-6 py-4">
                   {editingEventId === event.id ? (
                     <input
                       type="text"
                       value={editedEvent.name}
-                      onChange={(e) => setEditedEvent({...editedEvent, name: e.target.value})}
+                      onChange={(e) =>
+                        setEditedEvent({ ...editedEvent, name: e.target.value })
+                      }
                       className="p-1 border rounded w-full"
                     />
                   ) : (
@@ -131,7 +133,9 @@ export default function EventManagement() {
                     <input
                       type="date"
                       value={editedEvent.date}
-                      onChange={(e) => setEditedEvent({...editedEvent, date: e.target.value})}
+                      onChange={(e) =>
+                        setEditedEvent({ ...editedEvent, date: e.target.value })
+                      }
                       className="p-1 border rounded"
                     />
                   ) : (
@@ -143,7 +147,9 @@ export default function EventManagement() {
                     <input
                       type="text"
                       value={editedEvent.location}
-                      onChange={(e) => setEditedEvent({...editedEvent, location: e.target.value})}
+                      onChange={(e) =>
+                        setEditedEvent({ ...editedEvent, location: e.target.value })
+                      }
                       className="p-1 border rounded w-full"
                     />
                   ) : (
@@ -155,7 +161,9 @@ export default function EventManagement() {
                     <input
                       type="number"
                       value={editedEvent.participants}
-                      onChange={(e) => setEditedEvent({...editedEvent, participants: e.target.value})}
+                      onChange={(e) =>
+                        setEditedEvent({ ...editedEvent, participants: e.target.value })
+                      }
                       className="p-1 border rounded"
                     />
                   ) : (
@@ -165,13 +173,13 @@ export default function EventManagement() {
                 <td className="px-6 py-4 space-x-2">
                   {editingEventId === event.id ? (
                     <>
-                      <button 
+                      <button
                         onClick={handleSaveEdit}
                         className="text-green-600 hover:text-green-800"
                       >
                         Save
                       </button>
-                      <button 
+                      <button
                         onClick={handleCancelEdit}
                         className="text-gray-600 hover:text-gray-800"
                       >
@@ -180,13 +188,13 @@ export default function EventManagement() {
                     </>
                   ) : (
                     <>
-                      <button 
+                      <button
                         onClick={() => handleEditClick(event)}
                         className="text-blue-600 hover:text-blue-800"
                       >
                         Edit
                       </button>
-                      <button 
+                      <button
                         onClick={() => handleDeleteEvent(event.id)}
                         className="text-red-600 hover:text-red-800"
                       >
@@ -201,5 +209,5 @@ export default function EventManagement() {
         </table>
       </div>
     </div>
-  )
+  );
 }
