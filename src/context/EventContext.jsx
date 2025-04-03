@@ -1,4 +1,3 @@
-// src/context/EventContext.jsx
 import { createContext, useState, useContext } from 'react'
 
 const EventContext = createContext()

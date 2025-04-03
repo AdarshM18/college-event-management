@@ -1,58 +1,92 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react';
+import { db } from '../firebase';
+import { collection, addDoc, onSnapshot, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 
 export default function MerchandiseManagement() {
-  const [items, setItems] = useState([
-    {
-      id: 1,
-      name: 'College T-Shirt',
-      price: 499,
-      stock: 100,
-      status: 'available'
-    }
-  ])
-
+  const [items, setItems] = useState([]);
   const [newItem, setNewItem] = useState({
     name: '',
     price: '',
     stock: '',
     status: 'available'
-  })
-
-  const [editingItemId, setEditingItemId] = useState(null)
+  });
+  const [editingItemId, setEditingItemId] = useState(null);
   const [editedItem, setEditedItem] = useState({
     name: '',
     price: '',
     stock: '',
     status: 'available'
-  })
+  });
 
-  const handleAddItem = (e) => {
-    e.preventDefault()
-    setItems([...items, { ...newItem, id: items.length + 1 }])
-    setNewItem({ name: '', price: '', stock: '', status: 'available' })
-  }
+  // Firestore data subscription
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, 'merchandise'), (snapshot) => {
+      const itemsData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setItems(itemsData);
+    });
+    return () => unsubscribe();
+  }, []);
 
+  // Add Item
+  const handleAddItem = async (e) => {
+    e.preventDefault();
+    try {
+      await addDoc(collection(db, 'merchandise'), {
+        ...newItem,
+        price: Number(newItem.price),
+        stock: Number(newItem.stock)
+      });
+      setNewItem({ 
+        name: '', 
+        price: '', 
+        stock: '', 
+        status: 'available' 
+      });
+    } catch (error) {
+      alert('Error adding item: ' + error.message);
+    }
+  };
+
+  // Edit Item - Initialize edit mode
   const handleEditClick = (item) => {
-    setEditingItemId(item.id)
-    setEditedItem(item)
-  }
+    setEditingItemId(item.id);
+    setEditedItem(item);
+  };
 
-  const handleSaveEdit = () => {
-    setItems(items.map(item => 
-      item.id === editingItemId ? { ...editedItem, id: editingItemId } : item
-    ))
-    setEditingItemId(null)
-    setEditedItem({ name: '', price: '', stock: '', status: 'available' })
-  }
+  // Save Edited Item
+  const handleSaveEdit = async () => {
+    if (!editingItemId) return;
 
+    try {
+      const itemRef = doc(db, 'merchandise', editingItemId);
+      await updateDoc(itemRef, {
+        name: editedItem.name,
+        price: Number(editedItem.price),
+        stock: Number(editedItem.stock),
+        status: editedItem.status
+      });
+      setEditingItemId(null);
+    } catch (error) {
+      alert('Error updating item: ' + error.message);
+    }
+  };
+
+  // Cancel Editing
   const handleCancelEdit = () => {
-    setEditingItemId(null)
-    setEditedItem({ name: '', price: '', stock: '', status: 'available' })
-  }
+    setEditingItemId(null);
+  };
 
-  const handleDeleteItem = (itemId) => {
-    setItems(items.filter(item => item.id !== itemId))
-  }
+  // Delete Item
+  const handleDeleteItem = async (itemId) => {
+    try {
+      await deleteDoc(doc(db, 'merchandise', itemId));
+    } catch (error) {
+      alert('Error deleting item: ' + error.message);
+    }
+  };
 
   return (
     <div>
@@ -68,6 +102,7 @@ export default function MerchandiseManagement() {
             className="p-2 border rounded"
             value={newItem.name}
             onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
+            required
           />
           <input
             type="number"
@@ -75,6 +110,8 @@ export default function MerchandiseManagement() {
             className="p-2 border rounded"
             value={newItem.price}
             onChange={(e) => setNewItem({ ...newItem, price: e.target.value })}
+            required
+            min="1"
           />
           <input
             type="number"
@@ -82,11 +119,14 @@ export default function MerchandiseManagement() {
             className="p-2 border rounded"
             value={newItem.stock}
             onChange={(e) => setNewItem({ ...newItem, stock: e.target.value })}
+            required
+            min="0"
           />
           <select
             className="p-2 border rounded col-span-3"
             value={newItem.status}
             onChange={(e) => setNewItem({ ...newItem, status: e.target.value })}
+            required
           >
             <option value="available">Available</option>
             <option value="out-of-stock">Out of Stock</option>
@@ -121,7 +161,8 @@ export default function MerchandiseManagement() {
                       type="text"
                       value={editedItem.name}
                       onChange={(e) => setEditedItem({...editedItem, name: e.target.value})}
-                      className="p-1 border rounded"
+                      className="p-1 border rounded w-full"
+                      required
                     />
                   ) : (
                     item.name
@@ -133,7 +174,9 @@ export default function MerchandiseManagement() {
                       type="number"
                       value={editedItem.price}
                       onChange={(e) => setEditedItem({...editedItem, price: e.target.value})}
-                      className="p-1 border rounded"
+                      className="p-1 border rounded w-full"
+                      required
+                      min="1"
                     />
                   ) : (
                     `₹${item.price}`
@@ -145,7 +188,9 @@ export default function MerchandiseManagement() {
                       type="number"
                       value={editedItem.stock}
                       onChange={(e) => setEditedItem({...editedItem, stock: e.target.value})}
-                      className="p-1 border rounded"
+                      className="p-1 border rounded w-full"
+                      required
+                      min="0"
                     />
                   ) : (
                     item.stock
@@ -157,6 +202,7 @@ export default function MerchandiseManagement() {
                       value={editedItem.status}
                       onChange={(e) => setEditedItem({...editedItem, status: e.target.value})}
                       className="p-1 border rounded"
+                      required
                     >
                       <option value="available">Available</option>
                       <option value="out-of-stock">Out of Stock</option>
@@ -206,5 +252,5 @@ export default function MerchandiseManagement() {
         </table>
       </div>
     </div>
-  )
+  );
 }

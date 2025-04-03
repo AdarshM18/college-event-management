@@ -1,54 +1,81 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { db } from '../firebase';
+import { collection, addDoc, onSnapshot, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 
 export default function UserManagement() {
-  const [users, setUsers] = useState([
-    { id: 1, email: 'admin@college.edu', role: 'admin' },
-    { id: 2, email: 'student1@college.edu', role: 'student' },
-  ]);
+  const [users, setUsers] = useState([]);
+  const [newUser, setNewUser] = useState({ email: '', role: '' });
+  const [editingUserId, setEditingUserId] = useState(null);
+  const [editedUser, setEditedUser] = useState({ email: '', role: '' });
 
-  const [newUser, setNewUser] = useState({ email: '', role: '' }); // State for new user
-  const [editingUserId, setEditingUserId] = useState(null); // Track which user is being edited
-  const [editedUser, setEditedUser] = useState({ email: '', role: '' }); // Store edited user details
+  // Firestore data subscription
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, 'users'), (snapshot) => {
+      const usersData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setUsers(usersData);
+    });
+    return () => unsubscribe();
+  }, []);
 
-  // Handle Add User
-  const handleAddUser = () => {
+  // Add User
+  const handleAddUser = async () => {
     if (newUser.email.trim() && newUser.role.trim()) {
-      const newUserId = users.length ? users[users.length - 1].id + 1 : 1; // Generate new ID
-      const userToAdd = { id: newUserId, ...newUser };
-      setUsers([...users, userToAdd]); // Add new user to the list
-      setNewUser({ email: '', role: '' }); // Reset form
+      try {
+        await addDoc(collection(db, 'users'), {
+          email: newUser.email,
+          role: newUser.role
+        });
+        setNewUser({ email: '', role: '' });
+      } catch (error) {
+        alert('Error adding user: ' + error.message);
+      }
     } else {
       alert('Please fill in all fields.');
     }
   };
 
-  // Handle Edit Button Click
+  // Edit User - Initialize edit mode
   const handleEditClick = (user) => {
-    setEditingUserId(user.id); // Set the user ID being edited
-    setEditedUser({ email: user.email, role: user.role }); // Initialize edit form with current values
+    setEditingUserId(user.id);
+    setEditedUser({ email: user.email, role: user.role });
   };
 
-  // Handle Save Button Click (Save Edited User)
-  const handleSaveClick = () => {
-    setUsers((prevUsers) =>
-      prevUsers.map((user) =>
-        user.id === editingUserId ? { ...user, ...editedUser } : user
-      )
-    );
-    setEditingUserId(null); // Exit edit mode
-    setEditedUser({ email: '', role: '' }); // Reset edited user state
+  // Save Edited User
+  const handleSaveClick = async () => {
+    if (!editingUserId) return;
+
+    try {
+      const userRef = doc(db, 'users', editingUserId);
+      await updateDoc(userRef, {
+        email: editedUser.email,
+        role: editedUser.role
+      });
+      setEditingUserId(null);
+      setEditedUser({ email: '', role: '' });
+    } catch (error) {
+      alert('Error updating user: ' + error.message);
+    }
   };
 
-  // Handle Cancel Button Click (Cancel Editing)
+  // Cancel Editing
   const handleCancelClick = () => {
-    setEditingUserId(null); // Exit edit mode without saving changes
-    setEditedUser({ email: '', role: '' }); // Reset edited user state
+    setEditingUserId(null);
+    setEditedUser({ email: '', role: '' });
   };
 
-  // Handle Delete Button Click
-  const handleDeleteClick = (userId) => {
-    setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
+  // Delete User
+  const handleDeleteClick = async (userId) => {
+    try {
+      const userRef = doc(db, 'users', userId);
+      await deleteDoc(userRef);
+    } catch (error) {
+      alert('Error deleting user: ' + error.message);
+    }
   };
+
 
   return (
     <div>
