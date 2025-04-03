@@ -6,6 +6,7 @@ import Dashboard from "./components/Dashboard";
 import EventManagement from "./components/EventManagement";
 import MerchandiseManagement from "./components/MerchandiseManagement";
 import UserManagement from "./components/UserManagement";
+import ClubsManagement from "./components/ClubsManagement";
 import logo from './assets/iit-indore-logo.png';
 import './App.css';
 
@@ -79,7 +80,6 @@ export default function App() {
             <nav className="sidebar fixed left-0 top-[64px] h-full w-64 bg-white shadow-lg">
               <div className="p-4">
                 <ul className="space-y-2">
-                  {/* Use NavLink instead of Link */}
                   <li>
                     <NavLink
                       to="/"
@@ -118,6 +118,18 @@ export default function App() {
                   </li>
                   <li>
                     <NavLink
+                      to="/clubs"
+                      className={({ isActive }) =>
+                        isActive
+                          ? "block px-4 py-2 bg-gray-800 text-white rounded"
+                          : "block px-4 py-2 hover:bg-gray-200 rounded"
+                      }
+                    >
+                      Clubs
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
                       to="/users"
                       className={({ isActive }) =>
                         isActive
@@ -138,6 +150,7 @@ export default function App() {
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/events" element={<EventManagement />} />
                 <Route path="/merchandise" element={<MerchandiseManagement />} />
+                <Route path="/clubs" element={<ClubsManagement />} />
                 <Route path="/users" element={<UserManagement />} />
               </Routes>
             </main>
